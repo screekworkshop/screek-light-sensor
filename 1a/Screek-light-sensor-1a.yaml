@@ -1,0 +1,106 @@
+esphome:
+  name: screek-light-sensor-1a
+  comment: Screek Light-Sensor 1A
+  friendly_name: Screek Light-Sensor 1A
+  name_add_mac_suffix: True
+  platformio_options:
+    board_build.flash_mode: dio
+  project: 
+    name: Screek.Light_Sensor
+    version: 1A
+
+esp32:
+  board: lolin_c3_mini
+  framework:
+    type: arduino
+    version: 2.0.7
+    platform_version: 6.0.1
+
+external_components:
+  - source: screek-components
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "YOUR-OTA-SECRET"
+
+web_server:
+  port: 80
+
+wifi:
+  power_save_mode: HIGH
+  ap:
+    ssid: "SCREEK-MULTI-SENSOR-1A"
+
+captive_portal:
+
+improv_serial:
+  
+
+i2c:
+  sda: GPIO7
+  scl: GPIO11
+  scan: true
+  id: bus_a
+
+binary_sensor:
+  - platform: status
+    name: Online
+    id: ink_ha_connected
+
+sensor:
+  - platform: template
+    id: sys_esp_temperature
+    name: ESP Temperature
+    lambda: return temperatureRead();
+    unit_of_measurement: °C
+    device_class: TEMPERATURE
+    update_interval: 30s
+    entity_category: "diagnostic"
+  - platform: uptime
+    name: Uptime
+    id: sys_uptime
+    update_interval: 10s
+  - platform: wifi_signal 
+    name: RSSI
+    id: wifi_signal_db
+    update_interval: 5s
+    entity_category: "diagnostic"
+  - platform: template
+    id: esp_memory
+    icon: mdi:memory
+    name: ESP Free Memory
+    lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
+    unit_of_measurement: 'kB'
+    state_class: measurement
+    entity_category: "diagnostic"
+    disabled_by_default: True
+  - platform: bh1750
+    name: "Illuminance"
+    # address: 0x23
+    update_interval: 1s
+
+light:
+  - platform: status_led
+    name: sys_status
+    pin: GPIO12
+    internal: True
+    restore_mode: ALWAYS_OFF
+  - platform: status_led
+    name: sys_status
+    pin: GPIO13
+    internal: True
+    restore_mode: ALWAYS_OFF
+
+button:
+  - platform: restart
+    icon: mdi:power-cycle
+    name: "ESP Reboot"
+  - platform: factory_reset
+    disabled_by_default: True
+    name: Factory Reset
+    id: factory_reset_all
