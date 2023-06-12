@@ -18,7 +18,7 @@ esp32:
 
 external_components:
   # note: 
-  # Place the subfolder screek-components from the source directory into the config directory, and it will fetch this external library.
+  # place the subfolder screek-components from the source directory into the esphome yaml file root directory, and it will fetch this external library.
   - source: screek-components
 
 # Enable logging
