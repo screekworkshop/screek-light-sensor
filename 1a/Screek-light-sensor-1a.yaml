@@ -17,6 +17,8 @@ esp32:
     platform_version: 6.0.1
 
 external_components:
+  # note: 
+  # Place the subfolder screek-components from the source directory into the config directory, and it will fetch this external library.
   - source: screek-components
 
 # Enable logging
@@ -85,6 +87,8 @@ sensor:
     update_interval: 1s
 
 light:
+  # this the screek-components do the trick, if doesn't use the externel components (which you can), 
+  # you will need comment those light, otherwise you will get compile error due to the gpio should be use reserved for spi.
   - platform: status_led
     name: sys_status
     pin: GPIO12
