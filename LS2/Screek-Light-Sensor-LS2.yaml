@@ -1,0 +1,140 @@
+esphome:
+  name: light-sensor-ls2
+  comment: Screek Light-Sensor LS2
+  friendly_name: Light-Sensor LS2
+  name_add_mac_suffix: True
+  platformio_options:
+    board_build.flash_mode: dio
+  project: 
+    name: Screek.Light_Sensor
+    version: LS2
+  on_boot:
+    - priority: 100
+      then:
+        lambda: |-
+          id(cpu_speed) = ESP.getCpuFreqMHz();
+
+
+esp32:
+  board: lolin_c3_mini
+  framework:
+    type: arduino
+    version: 2.0.7
+    platform_version: 6.0.1
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
+      ref: main
+    components: [esp32, uart]
+
+logger:
+
+api:
+
+globals:
+  - id: cpu_speed
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+ota:
+  password: "your-ota-password"
+
+web_server:
+  port: 80
+
+wifi:
+  power_save_mode: LIGHT
+  ap:
+    ssid: "LIGHT-SENSOR-LS2"
+
+captive_portal:
+
+improv_serial:
+  
+
+i2c:
+  sda: GPIO7
+  scl: GPIO11
+  scan: true
+  id: bus_a
+
+binary_sensor:
+  - platform: status
+    name: Online
+    id: ink_ha_connected
+
+
+sensor:
+  - platform: template
+    id: sys_esp_temperature
+    name: ESP Temperature
+    lambda: return temperatureRead();
+    unit_of_measurement: °C
+    device_class: TEMPERATURE
+    update_interval: 30s
+    entity_category: "diagnostic"
+  - platform: uptime
+    name: Uptime
+    id: sys_uptime
+    update_interval: 10s
+  - platform: wifi_signal 
+    name: RSSI
+    id: wifi_signal_db
+    update_interval: 5s
+    entity_category: "diagnostic"
+  - platform: template
+    id: esp_memory
+    icon: mdi:memory
+    name: ESP Free Memory
+    lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
+    unit_of_measurement: 'kB'
+    state_class: measurement
+    entity_category: "diagnostic"
+    disabled_by_default: True
+  - platform: veml7700
+    address: 0x10
+    update_interval: 1s
+    # lux_compensation: false
+    # glass_attenuation_factor: 1.10
+    # auto_mode: false
+    # gain: 2x
+    # integration_time: 800ms
+    ambient_light:
+      name: "Ambient light"
+    full_spectrum:
+      name: "Full spectrum"
+    infrared:
+      name: "Near-IR"
+    actual_integration_time:
+      name: "Actual integration time"
+    actual_gain:
+      name: "Actual gain"
+    # ambient_light_counts:
+    #   name: "Ambient light counts"
+    # full_spectrum_counts:
+    #   name: "Full spectrum counts"
+
+light:
+  - platform: status_led
+    name: sys_status
+    pin: GPIO12
+    internal: True
+    restore_mode: ALWAYS_OFF
+  - platform: status_led
+    name: sys_status
+    pin: GPIO13
+    internal: True
+    restore_mode: ALWAYS_OFF
+
+button:
+  - platform: restart
+    # disabled_by_default: True
+    icon: mdi:power-cycle
+    name: "ESP Reboot"
+  - platform: factory_reset
+    disabled_by_default: True
+    name: Factory Reset
+    id: factory_reset_all
