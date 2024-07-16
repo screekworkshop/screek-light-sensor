@@ -40,7 +40,8 @@ globals:
     initial_value: '0'
 
 ota:
-  password: "your-ota-password"
+  - platform: esphome
+    password: "your-ota-password"
 
 web_server:
   port: 80
