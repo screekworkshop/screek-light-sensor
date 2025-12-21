@@ -1,47 +1,27 @@
 esphome:
   name: light-sensor-ls2
-  comment: Screek Light-Sensor LS2
-  friendly_name: Light-Sensor LS2
+  comment: Screek Light Sensor LS2
+  friendly_name: Light Sensor LS2
   name_add_mac_suffix: True
   platformio_options:
     board_build.flash_mode: dio
   project: 
-    name: Screek.Light_Sensor
-    version: LS2
-  on_boot:
-    - priority: 100
-      then:
-        lambda: |-
-          id(cpu_speed) = ESP.getCpuFreqMHz();
-
+    name: SCREEK.Light Sensor LS2
+    version: 25.12.21-A
 
 esp32:
   board: lolin_c3_mini
   framework:
-    type: arduino
-    version: 2.0.9
-    platform_version: 6.3.0
+    type: esp-idf
 
-external_components:
-  - source:
-      type: git
-      url: https://github.com/screekworkshop/custom_components_support_for_screek_1w
-      ref: main
-    components: [uart]
 
 logger:
 
 api:
 
-globals:
-  - id: cpu_speed
-    type: int
-    restore_value: no
-    initial_value: '0'
-
 ota:
   - platform: esphome
-    password: "your-ota-password"
+    password: !secret ls2_ota_password
 
 web_server:
   port: 80
@@ -69,10 +49,8 @@ binary_sensor:
 
 
 sensor:
-  - platform: template
-    id: sys_esp_temperature
-    name: ESP Temperature
-    lambda: return temperatureRead();
+  - platform: internal_temperature
+    name: "ESP Temperature"
     unit_of_measurement: °C
     device_class: TEMPERATURE
     update_interval: 30s
@@ -100,9 +78,10 @@ sensor:
     update_interval: 1s
     # lux_compensation: false
     # glass_attenuation_factor: 1.10
-    # auto_mode: false
-    # gain: 2x
-    # integration_time: 800ms
+    auto_mode: false
+    gain: 2x
+    integration_time: 800ms
+    
     ambient_light:
       name: "Ambient light"
     full_spectrum:
